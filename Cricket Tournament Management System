@@ -1,0 +1,146 @@
+class Team:
+    def __init__(self, team_name, captain, bowlers, batsmen, all_rounders):
+        self.team_name = team_name
+        self.captain = captain
+        self.bowlers = bowlers
+        self.batsmen = batsmen
+        self.all_rounders = all_rounders
+
+class MatchRecord(Team):
+    def __init__(self, team_name, captain, bowlers, batsmen, all_rounders, 
+                 opponent=None, runs=None, result=None, date=None):
+        super().__init__(team_name, captain, bowlers, batsmen, all_rounders)
+        self.opponent = opponent
+        self.runs = runs
+        self.result = result
+        self.date = date
+
+    def update_record(self, opponent, runs, result, date):
+        self.opponent = opponent
+        self.runs = runs
+        self.result = result
+        self.date = date
+
+class Player:
+    def __init__(self, player_id, player_name, team_name):
+        self.player_id = player_id
+        self.player_name = player_name
+        self.team_name = team_name
+
+class TournamentSystem:
+    def __init__(self):
+        self.teams = {} 
+        self.players = []
+
+    def add_team(self):
+        try:
+            name = input("Enter Team Name: ")
+            if name in self.teams:
+                raise KeyError("Team already exists.")
+            cap = input("Enter Captain Name: ")
+            boul = int(input("No. of Bowlers: "))
+            bats = int(input("No. of Batsmen: "))
+            allr = int(input("No. of All-rounders: "))
+            self.teams[name] = MatchRecord(name, cap, boul, bats, allr)
+            print("Team registered successfully!")
+        except ValueError:
+            print("Error: Please enter numeric values for player counts.")
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def add_match_record(self, team_name=None, opponent=None, runs=None, result=None, date=None):
+        try:
+            if team_name is None:
+                team_name = input("Enter Team Name for the record: ")
+                if team_name not in self.teams:
+                    raise KeyError("Team name not found in system.")
+                opponent = input("Enter Opponent Team: ")
+                runs = int(input("Enter Runs Scored: "))
+                result = input("Enter Result (Win/Loss/Draw): ")
+                date = input("Enter Date (DD-MM-YYYY): ")
+            
+            if team_name in self.teams:
+                self.teams[team_name].update_record(opponent, runs, result, date)
+                print(f"Match record for {team_name} added successfully!")
+            else:
+                print("Error: Team not found.")
+        except ValueError:
+            print("Error: Invalid numeric input for runs.")
+        except KeyError as e:
+            print(f"Error: {e}")
+
+    def update_match_record(self):
+        print("\n--- Update Existing Match Record ---")
+        self.add_match_record()
+
+    def search_team(self):
+        name = input("Enter Team Name to search: ")
+        team = self.teams.get(name)
+        if team:
+            print(f"\n--- {name} Details ---")
+            print(f"Captain: {team.captain}")
+            if team.opponent:
+                print(f"Last Match vs: {team.opponent} | Runs: {team.runs} | Result: {team.result} | Date: {team.date}")
+            else:
+                print("No match records found for this team.")
+        else:
+            print("Error: Team not found.")
+
+    def display_match_records(self):
+        print("\n--- All Recorded Matches ---")
+        found = False
+        for name, record in self.teams.items():
+            if record.opponent:
+                print(f"Team: {name} vs {record.opponent} | Result: {record.result} | Date: {record.date}")
+                found = True
+        if not found:
+            print("No match records available.")
+
+    def add_player(self):
+        try:
+            t_name = input("Enter Team Name: ")
+            if t_name not in self.teams:
+                raise RuntimeError("Cannot add player to a team that doesn't exist.")
+            p_id = input("Enter Player ID: ")
+            p_name = input("Enter Player Name: ")
+            self.players.append(Player(p_id, p_name, t_name))
+            print("Player registered successfully!")
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def display_players(self):
+        print("\n--- Registered Players ---")
+        if not self.players:
+            print("No players registered.")
+        for p in self.players:
+            print(f"ID: {p.player_id} | Name: {p.player_name} | Team: {p.team_name}")
+
+    def menu(self):
+        while True:
+            print("\n--- ICC T20 TOURNAMENT MANAGEMENT ---")
+            print("1. Add Team")
+            print("2. Add Match Record")
+            print("3. Update Match Record")
+            print("4. Search Team Match Details")
+            print("5. Display All Match Records")
+            print("6. Add Player to Team")
+            print("7. Display All Players")
+            print("8. Exit")
+            
+            choice = input("Enter Choice: ")
+            if choice == '1': self.add_team()
+            elif choice == '2': self.add_match_record()
+            elif choice == '3': self.update_match_record()
+            elif choice == '4': self.search_team()
+            elif choice == '5': self.display_match_records()
+            elif choice == '6': self.add_player()
+            elif choice == '7': self.display_players()
+            elif choice == '8': 
+                print("Exiting System...")
+                break
+            else: 
+                print("Invalid option. Please try again.")
+
+if __name__ == "__main__":
+    icc_system = TournamentSystem()
+    icc_system.menu()
